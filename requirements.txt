@@ -3,4 +3,4 @@ pandas
 numpy
 scikit-learn
 PyPDF2
-google-generativeai
+google-generativeai>=0.5.0
