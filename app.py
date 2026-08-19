@@ -186,7 +186,7 @@ st.sidebar.divider()
 pages = {
     "Core Tools": [
         st.Page(page_prediction, title="Placement Predictor", icon="📊"),
-        st.Page(page_ats, title="LLM ATS Scanner", icon="📄"),
+        st.Page(page_ats, title=" ATS Scanner", icon="📄"),
     ],
     "Guidance": [
         st.Page(page_roadmap, title="Prep Roadmap", icon="🗺️")
