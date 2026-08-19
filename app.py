@@ -110,7 +110,7 @@ def page_ats():
     st.title("📄 AI Resume ATS Scanner")
     st.markdown("Upload your PDF resume to evaluate it against a specific job description using Google Gemini.")
     
-    gemini_key = st.text_input("Enter Google Gemini API Key", type="password")
+    
     
     col1, col2 = st.columns([1, 1])
     with col1:
