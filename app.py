@@ -46,26 +46,52 @@ def extract_text_from_pdf(uploaded_file):
 
 def analyze_resume_with_gemini(api_key, resume_text, job_desc):
     genai.configure(api_key=api_key)
-    llm = genai.GenerativeModel('gemini-pro')
     
-    prompt = f"""
-    You are an expert IT Recruiter ATS system.
-    Analyze this candidate's resume against the following job description.
-    
-    Job Description: {job_desc}
-    Resume: {resume_text}
-    
-    Provide your output exactly in these 3 sections using Markdown formatting:
-    ### 1. Match Percentage
-    (Provide a single percentage score based on skills alignment)
-    ### 2. Missing Keywords
-    (List critical skills/tools required in the JD but missing from the resume)
-    ### 3. Actionable Feedback
-    (Give 2-3 brief tips to improve the resume format or content)
-    """
     try:
+        # 1. Ask Google for a list of EVERY model this specific API key is allowed to use
+        available_models = []
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                # Keep the exact formatting Google requires (e.g., 'models/gemini-1.5-flash')
+                available_models.append(m.name)
+        
+        # 2. If Google returns an empty list, the key itself is restricted
+        if not available_models:
+            return "API Error: Your API key is connected, but Google says it has ZERO text models available. You need to generate a brand new API key at aistudio.google.com."
+            
+        # 3. Take the very first model Google guarantees will work
+        guaranteed_model = available_models[0]
+        
+        # Prioritize finding a 1.5 model if it exists in the allowed list
+        for model_name in available_models:
+            if "1.5" in model_name:
+                guaranteed_model = model_name
+                break
+                
+        # 4. Run the LLM using the guaranteed working model
+        llm = genai.GenerativeModel(guaranteed_model)
+        
+        prompt = f"""
+        You are an expert IT Recruiter ATS system.
+        Analyze this candidate's resume against the following job description.
+        
+        Job Description: {job_desc}
+        Resume: {resume_text}
+        
+        Provide your output exactly in these 3 sections using Markdown formatting:
+        ### 1. Match Percentage
+        (Provide a single percentage score based on skills alignment)
+        ### 2. Missing Keywords
+        (List critical skills/tools required in the JD but missing from the resume)
+        ### 3. Actionable Feedback
+        (Give 2-3 brief tips to improve the resume format or content)
+        """
+        
         response = llm.generate_content(prompt)
-        return response.text
+        
+        # Add a success note at the top so you know which model finally worked
+        return f"*(Success! Processed using Google Model: {guaranteed_model})*\n\n" + response.text
+        
     except Exception as e:
         return f"API Error: {str(e)}"
 
