@@ -110,7 +110,18 @@ def page_ats():
     st.title("📄 AI Resume ATS Scanner")
     st.markdown("Upload your PDF resume to evaluate it against a specific job description using Google Gemini.")
     
-    
+    # Safely initialize the key first to prevent NameErrors
+    gemini_key = None
+    try:
+        # Check if secrets exist and grab the key
+        if "GEMINI_API_KEY" in st.secrets:
+            gemini_key = st.secrets["GEMINI_API_KEY"]
+    except Exception:
+        pass # If there's any issue reading secrets, gemini_key remains None
+        
+    # Show a warning if the key is missing so you know why it won't run
+    if not gemini_key:
+        st.warning("⚠️ API Key not found! Please configure GEMINI_API_KEY in your Streamlit Cloud Secrets.")
     
     col1, col2 = st.columns([1, 1])
     with col1:
@@ -120,7 +131,7 @@ def page_ats():
     
     if st.button("Run ATS Scan", type="primary"):
         if not gemini_key:
-            st.error("Please provide a Gemini API Key to run the LLM.")
+            st.error("Cannot run scan: Gemini API Key is missing. Check your Streamlit Cloud Settings.")
         elif not uploaded_pdf:
             st.error("Please upload a PDF resume.")
         else:
@@ -131,7 +142,6 @@ def page_ats():
                 st.divider()
                 st.subheader("🧠 ATS Evaluation Report")
                 st.markdown(feedback)
-
 # ==========================================
 # PAGE 3: PREPARATION ROADMAP
 # ==========================================
