@@ -46,7 +46,7 @@ def extract_text_from_pdf(uploaded_file):
 
 def analyze_resume_with_gemini(api_key, resume_text, job_desc):
     genai.configure(api_key=api_key)
-    llm = genai.GenerativeModel('gemini-1.5-flash-latest')
+    llm = genai.GenerativeModel('gemini-pro')
     
     prompt = f"""
     You are an expert IT Recruiter ATS system.
