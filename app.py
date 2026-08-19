@@ -187,24 +187,80 @@ def page_roadmap():
         """)
 
 # ==========================================
-# APP NAVIGATION ROUTING
+# APP NAVIGATION ROUTING & FLOATING CHATBOT
 # ==========================================
-# Sidebar branding
 st.sidebar.title("System Navigation")
 st.sidebar.markdown("**Developer:** Vishal Pandey")
 st.sidebar.markdown("**Roll Number:** 2400900100155")
 st.sidebar.divider()
 
-# Define the pages and group them
+# --- FLOATING CHATBOT WIDGET ---
+if "chat_messages" not in st.session_state:
+    st.session_state.chat_messages = []
+
+# This creates a button that opens a floating window over your app
+with st.sidebar.popover("💬 Open AI Assistant", use_container_width=True):
+    st.markdown("### 🤖 Placement Mentor")
+    st.caption("Ask me anything about DSA, interviews, or your resume!")
+    
+    # 1. Display previous chat history
+    chat_container = st.container(height=350)
+    with chat_container:
+        for msg in st.session_state.chat_messages:
+            st.chat_message(msg["role"]).write(msg["content"])
+            
+    # 2. Chat Input Form
+    with st.form("chat_form", clear_on_submit=True):
+        user_input = st.text_input("Type your question here...")
+        send_btn = st.form_submit_button("Send to AI", use_container_width=True)
+        
+    # 3. Process the AI Response
+    if send_btn and user_input:
+        # Save user message
+        st.session_state.chat_messages.append({"role": "user", "content": user_input})
+        
+        # Display user message instantly
+        with chat_container:
+            st.chat_message("user").write(user_input)
+            
+        # Get AI Response
+        try:
+            gemini_key = st.secrets.get("GEMINI_API_KEY", "")
+            if not gemini_key:
+                with chat_container:
+                    st.error("API Key missing in Secrets.")
+            else:
+                genai.configure(api_key=gemini_key)
+                # Using the exact model version we just fixed!
+                llm_chat = genai.GenerativeModel('gemini-3.6-flash')
+                
+                # We give the AI a persona so it acts like a mentor
+                system_prompt = f"You are a helpful college placement mentor. A student asks: {user_input}"
+                response = llm_chat.generate_content(system_prompt)
+                
+                # Save and display AI message
+                st.session_state.chat_messages.append({"role": "assistant", "content": response.text})
+                st.rerun() # Refresh the popover to show the new message
+                
+        except Exception as e:
+            with chat_container:
+                st.error(f"Chat Error: {str(e)}")
+
+st.sidebar.divider()
+
+# --- MULTI-PAGE ROUTING ---
 pages = {
     "Core Tools": [
         st.Page(page_prediction, title="Placement Predictor", icon="📊"),
-        st.Page(page_ats, title=" ATS Scanner", icon="📄"),
+        st.Page(page_ats, title="LLM ATS Scanner", icon="📄"),
     ],
     "Guidance": [
         st.Page(page_roadmap, title="Prep Roadmap", icon="🗺️")
     ]
 }
+
+pg = st.navigation(pages)
+pg.run()
 
 # Run the navigation router
 pg = st.navigation(pages)
