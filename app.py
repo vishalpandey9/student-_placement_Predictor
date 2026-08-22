@@ -43,7 +43,7 @@ st.markdown("""
         padding-bottom: 120px; 
     }
 
-    /* 3. The Perfect Circular Floating Chatbot */
+    /* 3. The Perfect Circular Floating Chatbot (HIGH VISIBILITY) */
     div[data-testid="stPopover"] {
         position: fixed;
         bottom: 40px;
@@ -52,31 +52,37 @@ st.markdown("""
     }
     
     div[data-testid="stPopover"] > button {
-        /* Light Blue Gradient */
-        background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+        /* Deep, rich Indigo/Navy Gradient for maximum contrast */
+        background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%) !important;
         color: white !important;
         /* Perfect Circle Settings */
         border-radius: 50% !important; 
-        width: 70px !important;
-        height: 70px !important;
+        width: 75px !important;
+        height: 75px !important;
         padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 12px 25px rgba(2, 132, 199, 0.4), inset 0 2px 4px rgba(255,255,255,0.4) !important;
-        border: 1px solid rgba(255,255,255,0.2) !important;
+        box-shadow: 0 12px 25px rgba(49, 46, 129, 0.5), inset 0 2px 4px rgba(255,255,255,0.3) !important;
+        border: 2px solid rgba(255,255,255,0.5) !important; /* White border to make it pop */
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
     }
     
     div[data-testid="stPopover"] > button:hover {
         transform: scale(1.1) translateY(-5px) !important;
-        box-shadow: 0 20px 35px rgba(2, 132, 199, 0.6), inset 0 2px 4px rgba(255,255,255,0.5) !important;
+        box-shadow: 0 20px 35px rgba(49, 46, 129, 0.7), inset 0 2px 4px rgba(255,255,255,0.5) !important;
     }
     
-    /* Make the robot emoji inside the button larger */
-    div[data-testid="stPopover"] > button p {
-        font-size: 35px !important;
+    /* Guarantee the robot emoji inside the button is highly visible */
+    div[data-testid="stPopover"] > button p, 
+    div[data-testid="stPopover"] > button span {
+        font-size: 38px !important;
         margin: 0 !important;
+        line-height: 1 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-shadow: 0 2px 6px rgba(0,0,0,0.5) !important; /* Drop shadow directly on the emoji */
     }
 
     /* 4. WIDER CHAT WINDOW */
@@ -213,7 +219,7 @@ selected_page = option_menu(
     orientation="horizontal",
     styles={
         "container": {"padding": "8px", "background-color": "rgba(255,255,255,0.8)", "border-radius": "20px", "box-shadow": "0 4px 15px rgba(0,0,0,0.05)", "backdrop-filter": "blur(10px)"},
-        "icon": {"color": "#38bdf8", "font-size": "20px"},
+        "icon": {"color": "#4f46e5", "font-size": "20px"},
         "nav-link": {"font-size": "16px", "font-weight": "600", "text-align": "center", "margin": "0px 5px", "border-radius": "12px", "--hover-color": "#f1f5f9"},
         "nav-link-selected": {"background-color": "#0f172a", "color": "white"},
     }
