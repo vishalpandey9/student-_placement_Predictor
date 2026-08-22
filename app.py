@@ -237,7 +237,7 @@ def create_word_docx(resume_content):
 # ==========================================
 col1, col2 = st.columns([3, 1])
 with col1:
-    st.markdown("<h2 style='font-weight: 800; color: #0f172a;'>🎓 Career Intelligence Platform</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='font-weight: 800; color: #e2e8f0;;'>🎓 Career Intelligence Platform</h2>", unsafe_allow_html=True)
 with col2:
     st.markdown("<div style='text-align: right; color: #64748b; margin-top: 10px;'><strong>Dev:</strong> Vishal Pandey<br><strong>Roll No:</strong> 2400900100155</div>", unsafe_allow_html=True)
 
