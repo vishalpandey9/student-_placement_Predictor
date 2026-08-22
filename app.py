@@ -13,7 +13,7 @@ st.set_page_config(page_title="AI Placement & ATS System", layout="wide", page_i
 
 st.markdown("""
 <style>
-    /* 1. Premium SaaS Background (Clean, Modern, Light) */
+    /* 1. Premium SaaS Background */
     .stApp {
         background-color: #f8fafc;
         background-image: radial-gradient(at 40% 20%, hsla(210,100%,95%,1) 0px, transparent 50%),
@@ -30,23 +30,20 @@ st.markdown("""
         }
     }
 
-    /* 2. Text & Content Animation (Fade and Slide up) */
+    /* 2. Page Content Animation */
     @keyframes slideUpFade {
         0% { opacity: 0; transform: translateY(40px); }
         100% { opacity: 1; transform: translateY(0); }
     }
-    
-    /* Apply animation to text, metric cards, and images */
     .stMarkdown, div[data-testid="metric-container"], .stImage {
         animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    
     .main .block-container {
         padding-top: 1rem; 
-        padding-bottom: 120px; /* Space for the floating chatbot */
+        padding-bottom: 120px; 
     }
 
-    /* 3. The Floating "AI Chatbot" (Light Blue, Fixed, Shaded, Rounded) */
+    /* 3. The Perfect Circular Floating Chatbot */
     div[data-testid="stPopover"] {
         position: fixed;
         bottom: 40px;
@@ -55,41 +52,57 @@ st.markdown("""
     }
     
     div[data-testid="stPopover"] > button {
-        /* Premium Light Blue Gradient with internal shading */
+        /* Light Blue Gradient */
         background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
         color: white !important;
-        border-radius: 50px !important; /* Circular/Pill shape */
-        padding: 16px 28px !important;
+        /* Perfect Circle Settings */
+        border-radius: 50% !important; 
+        width: 70px !important;
+        height: 70px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         box-shadow: 0 12px 25px rgba(2, 132, 199, 0.4), inset 0 2px 4px rgba(255,255,255,0.4) !important;
-        font-size: 16px !important;
-        font-weight: 700 !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
     }
     
     div[data-testid="stPopover"] > button:hover {
-        transform: scale(1.08) translateY(-5px) !important;
+        transform: scale(1.1) translateY(-5px) !important;
         box-shadow: 0 20px 35px rgba(2, 132, 199, 0.6), inset 0 2px 4px rgba(255,255,255,0.5) !important;
     }
+    
+    /* Make the robot emoji inside the button larger */
+    div[data-testid="stPopover"] > button p {
+        font-size: 35px !important;
+        margin: 0 !important;
+    }
 
-    /* 4. Glassmorphism Metric Cards */
+    /* 4. WIDER CHAT WINDOW */
+    div[data-testid="stPopoverBody"] {
+        width: 450px !important;
+        max-width: 90vw !important;
+        border-radius: 20px !important;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+    }
+
+    /* 5. Glassmorphism Metric Cards */
     div[data-testid="metric-container"] {
         background: rgba(255, 255, 255, 0.65);
         backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.4);
         padding: 25px;
         border-radius: 20px;
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: transform 0.3s ease;
     }
-    
     div[data-testid="metric-container"]:hover {
         transform: translateY(-5px);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
     }
 
-    /* 5. Highly Professional Images */
+    /* 6. Highly Professional Images */
     img {
         border-radius: 20px;
         box-shadow: 0 15px 40px rgba(0,0,0,0.12);
@@ -103,7 +116,7 @@ st.markdown("""
         transform: scale(1.02);
     }
     
-    /* 6. Form Button Styling */
+    /* 7. Form Button Styling */
     button[kind="primary"] {
         background: linear-gradient(135deg, #1e293b, #0f172a);
         color: white;
@@ -191,7 +204,6 @@ with col2:
 
 st.write("") 
 
-# The Attractive Slide-Bar Navigation
 selected_page = option_menu(
     menu_title=None,
     options=["Predictor Engine", "Resume ATS", "Career Roadmap"],
@@ -215,7 +227,6 @@ st.write("")
 # ==========================================
 
 if selected_page == "Predictor Engine":
-    # Ultra-premium Analytics Image
     st.image("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
     st.title("📊 Placement Probability Engine")
     st.markdown("Analyze your academic metrics to receive a precise probability score and a detailed diagnostic report.")
@@ -270,7 +281,6 @@ if selected_page == "Predictor Engine":
 
 
 elif selected_page == "Resume ATS":
-    # Premium Abstract Corporate/Code Image
     st.image("https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
     st.title("📄 AI Resume ATS Scanner")
     st.markdown("Evaluate your resume against specific job descriptions to bypass automated filters.")
@@ -301,7 +311,6 @@ elif selected_page == "Resume ATS":
 
 
 elif selected_page == "Career Roadmap":
-    # Premium Modern Tech Path Image
     st.image("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
     st.title("🗺️ Comprehensive Career Roadmap")
     st.markdown("A deep-dive, 6-month execution plan engineered for your target industry.")
@@ -348,16 +357,21 @@ elif selected_page == "Career Roadmap":
 
 
 # ==========================================
-# THE FLOATING RIGHT-SIDE AI CHATBOT
+# THE FLOATING RIGHT-SIDE AI CHATBOT (CIRCULAR)
 # ==========================================
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
-# The CSS at the top permanently fixes this to the bottom right corner
-with st.popover("🤖 AI Chatbot"):
+# Just the robot icon now—CSS turns this into a perfect circle
+with st.popover("🤖"):
     st.markdown("### 🤖 Placement Mentor")
-    st.caption("Ask me anything about your career journey!")
     
+    # 1. INPUT FORM MOVED TO THE VERY TOP
+    with st.form("chat_form", clear_on_submit=True):
+        user_input = st.text_input("Type your question here...")
+        send_btn = st.form_submit_button("Send Question", use_container_width=True)
+        
+    # 2. QUICK ACTION FAQs 
     faq_col1, faq_col2 = st.columns(2)
     if faq_col1.button("Improve DSA?", use_container_width=True, key="faq1"):
         st.session_state.chat_messages.append({"role": "user", "content": "How can I improve my DSA scores?"})
@@ -368,15 +382,13 @@ with st.popover("🤖 AI Chatbot"):
     
     st.divider()
     
-    chat_container = st.container(height=300)
+    # 3. WIDER, TALLER CHAT CONTAINER MOVED TO THE BOTTOM
+    chat_container = st.container(height=380)
     with chat_container:
         for msg in st.session_state.chat_messages:
             st.chat_message(msg["role"]).write(msg["content"])
             
-    with st.form("chat_form", clear_on_submit=True):
-        user_input = st.text_input("Type your question here...")
-        send_btn = st.form_submit_button("Send", use_container_width=True)
-        
+    # 4. PROCESSING LOGIC
     if (send_btn and user_input) or (len(st.session_state.chat_messages) > 0 and st.session_state.chat_messages[-1]["role"] == "user" and send_btn == False):
         if send_btn and user_input:
             st.session_state.chat_messages.append({"role": "user", "content": user_input})
@@ -389,7 +401,7 @@ with st.popover("🤖 AI Chatbot"):
                     st.error("API Key missing.")
             else:
                 with chat_container:
-                    with st.spinner("Typing..."):
+                    with st.spinner("Mentor is typing..."):
                         genai.configure(api_key=gemini_key)
                         llm_chat = genai.GenerativeModel('gemini-3.6-flash')
                         last_user_msg = st.session_state.chat_messages[-1]["content"]
@@ -400,4 +412,4 @@ with st.popover("🤖 AI Chatbot"):
                         
         except Exception as e:
             with chat_container:
-                st.error("Connection Error.")
+                st.error("Connection Error. Check API Key.")
