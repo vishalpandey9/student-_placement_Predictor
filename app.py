@@ -7,94 +7,113 @@ import google.generativeai as genai
 from streamlit_option_menu import option_menu
 
 # ==========================================
-# PAGE CONFIGURATION & ADVANCED CSS
+# PAGE CONFIGURATION & PREMIUM CSS
 # ==========================================
 st.set_page_config(page_title="AI Placement & ATS System", layout="wide", page_icon="🎓")
 
-# Injecting Advanced Custom CSS for Ultimate Responsiveness & Floating Chat
 st.markdown("""
 <style>
-    /* 1. Dynamic Animated Gradient Background */
+    /* 1. Premium SaaS Background (Clean, Modern, Light) */
     .stApp {
-        background: linear-gradient(-45deg, #f8f9fa, #e9ecef, #f1f3f5, #ffffff);
-        background-size: 400% 400%;
-        animation: gradientBG 15s ease infinite;
-    }
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+        background-color: #f8fafc;
+        background-image: radial-gradient(at 40% 20%, hsla(210,100%,95%,1) 0px, transparent 50%),
+                          radial-gradient(at 80% 0%, hsla(189,100%,96%,1) 0px, transparent 50%),
+                          radial-gradient(at 0% 50%, hsla(210,100%,96%,1) 0px, transparent 50%);
+        background-attachment: fixed;
     }
     
     @media (prefers-color-scheme: dark) {
         .stApp {
-            background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #0f172a);
+            background-color: #0f172a;
+            background-image: radial-gradient(at 40% 20%, hsla(220,50%,15%,1) 0px, transparent 50%),
+                              radial-gradient(at 80% 0%, hsla(200,60%,15%,1) 0px, transparent 50%);
         }
     }
 
-    /* 2. Page Transition Animation */
-    @keyframes fadeSlideUp {
-        0% { opacity: 0; transform: translateY(20px); }
+    /* 2. Text & Content Animation (Fade and Slide up) */
+    @keyframes slideUpFade {
+        0% { opacity: 0; transform: translateY(40px); }
         100% { opacity: 1; transform: translateY(0); }
     }
-    .main .block-container {
-        animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        padding-top: 2rem; 
-        padding-bottom: 100px; /* Space for the floating chat */
+    
+    /* Apply animation to text, metric cards, and images */
+    .stMarkdown, div[data-testid="metric-container"], .stImage {
+        animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
     
-    /* 3. Floating Right-Side Chatbot (The Magic) */
+    .main .block-container {
+        padding-top: 1rem; 
+        padding-bottom: 120px; /* Space for the floating chatbot */
+    }
+
+    /* 3. The Floating "AI Chatbot" (Light Blue, Fixed, Shaded, Rounded) */
     div[data-testid="stPopover"] {
         position: fixed;
-        bottom: 30px;
-        right: 30px;
-        z-index: 99999;
-    }
-    div[data-testid="stPopover"] > button {
-        background: linear-gradient(135deg, #6e8efb, #a777e3) !important;
-        color: white !important;
-        border-radius: 50px !important;
-        padding: 15px 30px !important;
-        box-shadow: 0 10px 25px rgba(110, 142, 251, 0.4) !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        border: none !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
-    div[data-testid="stPopover"] > button:hover {
-        transform: scale(1.05) translateY(-4px) !important;
-        box-shadow: 0 15px 35px rgba(110, 142, 251, 0.6) !important;
-    }
-
-    /* 4. Button Interactions */
-    .stButton>button {
-        transition: all 0.2s ease;
-        border-radius: 10px;
-        font-weight: 600;
-    }
-    .stButton>button:active {
-        transform: scale(0.95);
+        bottom: 40px;
+        right: 40px;
+        z-index: 999999;
     }
     
-    /* 5. Glassmorphism Metric Cards */
-    div[data-testid="metric-container"] {
-        background: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        padding: 20px;
-        border-radius: 16px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    div[data-testid="stPopover"] > button {
+        /* Premium Light Blue Gradient with internal shading */
+        background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%) !important;
+        color: white !important;
+        border-radius: 50px !important; /* Circular/Pill shape */
+        padding: 16px 28px !important;
+        box-shadow: 0 12px 25px rgba(2, 132, 199, 0.4), inset 0 2px 4px rgba(255,255,255,0.4) !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
+    }
+    
+    div[data-testid="stPopover"] > button:hover {
+        transform: scale(1.08) translateY(-5px) !important;
+        box-shadow: 0 20px 35px rgba(2, 132, 199, 0.6), inset 0 2px 4px rgba(255,255,255,0.5) !important;
     }
 
-    /* 6. Polished Images */
+    /* 4. Glassmorphism Metric Cards */
+    div[data-testid="metric-container"] {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 25px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    div[data-testid="metric-container"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 5. Highly Professional Images */
     img {
-        border-radius: 16px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        margin-bottom: 25px;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        margin-bottom: 30px;
         object-fit: cover;
         width: 100%;
-        height: 300px; /* Fixed height for clean aesthetic */
+        height: 350px; 
+        transition: transform 0.5s ease;
+    }
+    img:hover {
+        transform: scale(1.02);
+    }
+    
+    /* 6. Form Button Styling */
+    button[kind="primary"] {
+        background: linear-gradient(135deg, #1e293b, #0f172a);
+        color: white;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    button[kind="primary"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -162,41 +181,42 @@ def analyze_resume_with_gemini(api_key, resume_text, job_desc):
 
 
 # ==========================================
-# VISIBLE TOP NAVIGATION BAR
+# PREMIUM NAVIGATION BAR
 # ==========================================
-# College Project Header
 col1, col2 = st.columns([3, 1])
 with col1:
-    st.markdown("### 🎓 AI-Powered Placement & ATS Platform")
+    st.markdown("<h2 style='font-weight: 800; color: #0f172a;'>🎓 Career Intelligence Platform</h2>", unsafe_allow_html=True)
 with col2:
-    st.markdown("<div style='text-align: right; color: gray;'><strong>Developer:</strong> Vishal Pandey<br><strong>Roll No:</strong> 2400900100155</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: right; color: #64748b; margin-top: 10px;'><strong>Dev:</strong> Vishal Pandey<br><strong>Roll No:</strong> 2400900100155</div>", unsafe_allow_html=True)
 
-st.write("") # Spacer
+st.write("") 
 
+# The Attractive Slide-Bar Navigation
 selected_page = option_menu(
     menu_title=None,
     options=["Predictor Engine", "Resume ATS", "Career Roadmap"],
-    icons=["bar-chart-line", "file-earmark-person", "map"],
+    icons=["graph-up-arrow", "file-earmark-code", "compass"],
     menu_icon="cast",
     default_index=0,
     orientation="horizontal",
     styles={
-        "container": {"padding": "0!important", "background-color": "transparent"},
-        "icon": {"color": "#6e8efb", "font-size": "18px"},
-        "nav-link": {"font-size": "16px", "text-align": "center", "margin": "0px", "--hover-color": "#e9ecef"},
-        "nav-link-selected": {"background-color": "#6e8efb", "color": "white"},
+        "container": {"padding": "8px", "background-color": "rgba(255,255,255,0.8)", "border-radius": "20px", "box-shadow": "0 4px 15px rgba(0,0,0,0.05)", "backdrop-filter": "blur(10px)"},
+        "icon": {"color": "#38bdf8", "font-size": "20px"},
+        "nav-link": {"font-size": "16px", "font-weight": "600", "text-align": "center", "margin": "0px 5px", "border-radius": "12px", "--hover-color": "#f1f5f9"},
+        "nav-link-selected": {"background-color": "#0f172a", "color": "white"},
     }
 )
 
-st.divider()
+st.write("")
+st.write("")
 
 # ==========================================
 # PAGE CONTROLLERS
 # ==========================================
 
 if selected_page == "Predictor Engine":
-    # Premium Data Image
-    st.image("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1600&q=80", use_container_width=True)
+    # Ultra-premium Analytics Image
+    st.image("https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
     st.title("📊 Placement Probability Engine")
     st.markdown("Analyze your academic metrics to receive a precise probability score and a detailed diagnostic report.")
     
@@ -250,8 +270,8 @@ if selected_page == "Predictor Engine":
 
 
 elif selected_page == "Resume ATS":
-    # Premium Corporate Desk Image
-    st.image("https://images.unsplash.com/photo-1586281380117-5a60ae2050cc?auto=format&fit=crop&w=1600&q=80", use_container_width=True)
+    # Premium Abstract Corporate/Code Image
+    st.image("https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
     st.title("📄 AI Resume ATS Scanner")
     st.markdown("Evaluate your resume against specific job descriptions to bypass automated filters.")
     
@@ -281,8 +301,8 @@ elif selected_page == "Resume ATS":
 
 
 elif selected_page == "Career Roadmap":
-    # Premium Architecture/Path Image
-    st.image("https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1600&q=80", use_container_width=True)
+    # Premium Modern Tech Path Image
+    st.image("https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
     st.title("🗺️ Comprehensive Career Roadmap")
     st.markdown("A deep-dive, 6-month execution plan engineered for your target industry.")
     
@@ -328,13 +348,13 @@ elif selected_page == "Career Roadmap":
 
 
 # ==========================================
-# THE FLOATING RIGHT-SIDE AI MENTOR
+# THE FLOATING RIGHT-SIDE AI CHATBOT
 # ==========================================
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
-# This popover is completely controlled by the CSS at the top of the file
-with st.popover("💬 AI Assistant"):
+# The CSS at the top permanently fixes this to the bottom right corner
+with st.popover("🤖 AI Chatbot"):
     st.markdown("### 🤖 Placement Mentor")
     st.caption("Ask me anything about your career journey!")
     
