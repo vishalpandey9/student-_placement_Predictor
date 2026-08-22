@@ -5,6 +5,8 @@ from sklearn.ensemble import RandomForestClassifier
 import PyPDF2
 import google.generativeai as genai
 from streamlit_option_menu import option_menu
+import io
+from docx import Document
 
 # ==========================================
 # PAGE CONFIGURATION & PREMIUM CSS
@@ -52,10 +54,8 @@ st.markdown("""
     }
     
     div[data-testid="stPopover"] > button {
-        /* Deep, rich Indigo/Navy Gradient for maximum contrast */
         background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%) !important;
         color: white !important;
-        /* Perfect Circle Settings */
         border-radius: 50% !important; 
         width: 75px !important;
         height: 75px !important;
@@ -64,7 +64,7 @@ st.markdown("""
         align-items: center !important;
         justify-content: center !important;
         box-shadow: 0 12px 25px rgba(49, 46, 129, 0.5), inset 0 2px 4px rgba(255,255,255,0.3) !important;
-        border: 2px solid rgba(255,255,255,0.5) !important; /* White border to make it pop */
+        border: 2px solid rgba(255,255,255,0.5) !important; 
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease !important;
     }
     
@@ -73,7 +73,6 @@ st.markdown("""
         box-shadow: 0 20px 35px rgba(49, 46, 129, 0.7), inset 0 2px 4px rgba(255,255,255,0.5) !important;
     }
     
-    /* Guarantee the robot emoji inside the button is highly visible */
     div[data-testid="stPopover"] > button p, 
     div[data-testid="stPopover"] > button span {
         font-size: 38px !important;
@@ -82,7 +81,7 @@ st.markdown("""
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        text-shadow: 0 2px 6px rgba(0,0,0,0.5) !important; /* Drop shadow directly on the emoji */
+        text-shadow: 0 2px 6px rgba(0,0,0,0.5) !important; 
     }
 
     /* 4. WIDER CHAT WINDOW */
@@ -145,21 +144,17 @@ st.markdown("""
 def train_model():
     np.random.seed(42)
     n_samples = 500
-    
     data = pd.DataFrame({
         'CGPA': np.random.uniform(5.0, 10.0, n_samples),
         'DSA_Score': np.random.randint(10, 100, n_samples),
         'Internships': np.random.randint(0, 4, n_samples),
         'Projects': np.random.randint(1, 6, n_samples),
     })
-    
     score = (data['CGPA']*10 + data['DSA_Score'] + data['Internships']*20 + data['Projects']*10)
     threshold = score.median()
     data['Placed'] = (score > threshold).astype(int)
-    
     X = data.drop('Placed', axis=1)
     y = data['Placed']
-    
     model = RandomForestClassifier(n_estimators=100, random_state=42)
     model.fit(X, y)
     return model
@@ -168,7 +163,7 @@ model = train_model()
 
 
 # ==========================================
-# UTILITY FUNCTIONS
+# UTILITY FUNCTIONS (LLM & Word Doc Gen)
 # ==========================================
 def extract_text_from_pdf(uploaded_file):
     pdf_reader = PyPDF2.PdfReader(uploaded_file)
@@ -184,10 +179,8 @@ def analyze_resume_with_gemini(api_key, resume_text, job_desc):
         prompt = f"""
         You are an expert IT Recruiter ATS system.
         Analyze this candidate's resume against the following job description.
-        
         Job Description: {job_desc}
         Resume: {resume_text}
-        
         Provide your output exactly in these 3 sections using Markdown formatting:
         ### 1. Match Percentage
         ### 2. Missing Keywords
@@ -197,6 +190,46 @@ def analyze_resume_with_gemini(api_key, resume_text, job_desc):
         return response.text
     except Exception as e:
         return f"API Error: {str(e)}"
+
+def generate_tailored_resume(api_key, resume_text, job_desc):
+    genai.configure(api_key=api_key)
+    try:
+        llm = genai.GenerativeModel('gemini-3.6-flash')
+        prompt = f"""
+        You are an expert Resume Writer and Career Coach.
+        Rewrite and format the following resume to perfectly align with the provided job description.
+        Highlight relevant skills and experiences. Maintain truthfulness but optimize keywords for ATS.
+        Output ONLY the resume text in clean markdown.
+
+        Job Description: {job_desc}
+        Original Resume: {resume_text}
+        """
+        response = llm.generate_content(prompt)
+        return response.text
+    except Exception as e:
+        return f"API Error: {str(e)}"
+
+def create_word_docx(resume_content):
+    doc = Document()
+    doc.add_heading("Tailored Professional Resume", 0)
+    
+    # Simple markdown parser for Word Doc formatting
+    for line in resume_content.split('\n'):
+        if line.strip():
+            if line.startswith('###') or line.startswith('##'):
+                doc.add_heading(line.replace('#', '').strip(), level=2)
+            elif line.startswith('-') or line.startswith('*'):
+                doc.add_paragraph(line[1:].strip(), style='List Bullet')
+            elif line.startswith('**') and line.endswith('**'):
+                p = doc.add_paragraph()
+                p.add_run(line.replace('**', '').strip()).bold = True
+            else:
+                doc.add_paragraph(line.strip())
+                
+    # Save document to memory buffer
+    bio = io.BytesIO()
+    doc.save(bio)
+    return bio.getvalue()
 
 
 # ==========================================
@@ -288,16 +321,24 @@ if selected_page == "Predictor Engine":
 
 elif selected_page == "Resume ATS":
     st.image("https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=2000&q=80", use_container_width=True)
-    st.title("📄 AI Resume ATS Scanner")
-    st.markdown("Evaluate your resume against specific job descriptions to bypass automated filters.")
+    st.title("📄 AI Resume ATS Scanner & Generator")
+    st.markdown("Evaluate your resume against specific job descriptions to bypass automated filters, then let AI auto-generate a tailored version.")
     
+    # Initialize Session States for ATS Memory
+    if "ats_feedback" not in st.session_state:
+        st.session_state.ats_feedback = None
+    if "resume_text" not in st.session_state:
+        st.session_state.resume_text = ""
+    if "job_desc" not in st.session_state:
+        st.session_state.job_desc = ""
+
     gemini_key = st.secrets.get("GEMINI_API_KEY", None)
     if not gemini_key:
         st.warning("⚠️ API Key not found! Please configure GEMINI_API_KEY in your Streamlit Cloud Secrets.")
     
     col1, col2 = st.columns([1, 1], gap="large")
     with col1:
-        job_description = st.text_area("Paste Target Job Description", "Software Engineer with Python, SQL, and Data Structures expertise.", height=200)
+        st.session_state.job_desc = st.text_area("Paste Target Job Description", st.session_state.job_desc or "Software Engineer with Python, SQL, and Data Structures expertise.", height=200)
     with col2:
         uploaded_pdf = st.file_uploader("Upload Resume (PDF)", type=["pdf"])
     
@@ -308,12 +349,38 @@ elif selected_page == "Resume ATS":
             st.error("Please upload a PDF resume.")
         else:
             with st.spinner("🚀 Extracting text, analyzing semantic matches, and querying LLM..."):
-                resume_text = extract_text_from_pdf(uploaded_pdf)
-                feedback = analyze_resume_with_gemini(gemini_key, resume_text, job_description)
+                st.session_state.resume_text = extract_text_from_pdf(uploaded_pdf)
+                st.session_state.ats_feedback = analyze_resume_with_gemini(gemini_key, st.session_state.resume_text, st.session_state.job_desc)
                 
-                st.divider()
-                st.subheader("🧠 ATS Evaluation Report")
-                st.markdown(feedback)
+    # Display Results and Offer Generation
+    if st.session_state.ats_feedback:
+        st.divider()
+        st.subheader("🧠 ATS Evaluation Report")
+        st.markdown(st.session_state.ats_feedback)
+        
+        st.divider()
+        st.markdown("### 📝 Need a better match?")
+        st.info("Would you like our AI to automatically rewrite and format your resume specifically for this job description?")
+        
+        if st.button("✨ Yes, Auto-Generate Tailored Resume", use_container_width=True):
+            with st.spinner("🤖 AI is rewriting your resume for maximum ATS compatibility..."):
+                # 1. Ask LLM to rewrite
+                tailored_markdown = generate_tailored_resume(gemini_key, st.session_state.resume_text, st.session_state.job_desc)
+                
+                # 2. Convert Markdown to .docx
+                docx_file = create_word_docx(tailored_markdown)
+                
+                st.success("✅ Tailored Resume Generated Successfully!")
+                
+                # 3. Provide Download Button
+                st.download_button(
+                    label="📥 Download Tailored Resume (.docx)",
+                    data=docx_file,
+                    file_name="AI_Tailored_Resume.docx",
+                    mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    type="primary",
+                    use_container_width=True
+                )
 
 
 elif selected_page == "Career Roadmap":
@@ -368,16 +435,13 @@ elif selected_page == "Career Roadmap":
 if "chat_messages" not in st.session_state:
     st.session_state.chat_messages = []
 
-# Just the robot icon now—CSS turns this into a perfect circle
 with st.popover("🤖"):
     st.markdown("### 🤖 Placement Mentor")
     
-    # 1. INPUT FORM MOVED TO THE VERY TOP
     with st.form("chat_form", clear_on_submit=True):
         user_input = st.text_input("Type your question here...")
         send_btn = st.form_submit_button("Send Question", use_container_width=True)
         
-    # 2. QUICK ACTION FAQs 
     faq_col1, faq_col2 = st.columns(2)
     if faq_col1.button("Improve DSA?", use_container_width=True, key="faq1"):
         st.session_state.chat_messages.append({"role": "user", "content": "How can I improve my DSA scores?"})
@@ -388,13 +452,11 @@ with st.popover("🤖"):
     
     st.divider()
     
-    # 3. WIDER, TALLER CHAT CONTAINER MOVED TO THE BOTTOM
     chat_container = st.container(height=380)
     with chat_container:
         for msg in st.session_state.chat_messages:
             st.chat_message(msg["role"]).write(msg["content"])
             
-    # 4. PROCESSING LOGIC
     if (send_btn and user_input) or (len(st.session_state.chat_messages) > 0 and st.session_state.chat_messages[-1]["role"] == "user" and send_btn == False):
         if send_btn and user_input:
             st.session_state.chat_messages.append({"role": "user", "content": user_input})
